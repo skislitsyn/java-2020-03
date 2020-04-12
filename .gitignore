@@ -39,4 +39,4 @@ build
 .project
 .settings
 .metadata
-/bin/
+bin
