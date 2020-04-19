@@ -1,5 +1,6 @@
 package skislitsyn;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -39,30 +40,22 @@ public class MyArrayList<T> implements List<T> {
     @SuppressWarnings("unchecked")
     @Override
     public T get(int index) {
-	if (index < 0 || index > lastElementIndex) {
-	    throw new IllegalArgumentException("Index out of bound");
-	} else {
-	    return (T) container[index];
-	}
+	validateIndex(index);
+	return (T) container[index];
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public T set(int index, T element) {
-	if (index < 0 || index > lastElementIndex) {
-	    throw new IllegalArgumentException("Index out of bound");
-	} else {
-	    T previousElement = (T) container[index];
-	    container[index] = element;
-	    return previousElement;
-	}
+	validateIndex(index);
+	T previousElement = (T) container[index];
+	container[index] = element;
+	return previousElement;
     }
 
     @Override
     public Object[] toArray() {
-	Object[] result = new Object[size()];
-	System.arraycopy(container, 0, result, 0, size());
-	return result;
+	return Arrays.copyOf(container, size());
     }
 
     @Override
@@ -77,8 +70,7 @@ public class MyArrayList<T> implements List<T> {
 
     private void resizeContainer() {
 	size *= CONTAINER_RESIZE_MULTIPLIER;
-	Object[] resizedContainer = new Object[size];
-	System.arraycopy(container, 0, resizedContainer, 0, container.length);
+	Object[] resizedContainer = Arrays.copyOf(container, size);
 	container = resizedContainer;
     }
 
@@ -163,6 +155,12 @@ public class MyArrayList<T> implements List<T> {
 	    return (T) MyArrayList.this.container[currentElementIndex];
 	}
 
+    }
+
+    private void validateIndex(int index) {
+	if (index < 0 || index > lastElementIndex) {
+	    throw new IllegalArgumentException("Index out of bound");
+	}
     }
 
     @Override
