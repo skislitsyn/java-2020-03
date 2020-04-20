@@ -7,5 +7,7 @@ public class MyTestEngineApp {
     public static void main(String[] args) {
 	MyTestEngine myTestEngine = new MyTestEngine(MySimpleCalendarTest.class);
 	myTestEngine.doTesting();
+	myTestEngine.doTesting();
+	myTestEngine.doTesting();
     }
 }

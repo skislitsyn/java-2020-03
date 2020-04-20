@@ -6,18 +6,20 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class MyTestEngine {
-    private Class<?> clazz;
+    private final Class<?> clazz;
+    private final ArrayList<String> beforeMethods = new ArrayList<>();
+    private final ArrayList<String> afterMethods = new ArrayList<>();
+    private final ArrayList<String> testMethods = new ArrayList<>();
+    private boolean metadataExtracted = false;
     private int performedTestsCounter = 0;
     private int failedTestsCounter = 0;
-    private ArrayList<String> beforeMethods = new ArrayList<String>();
-    private ArrayList<String> afterMethods = new ArrayList<String>();
-    private ArrayList<String> testMethods = new ArrayList<String>();
 
     public MyTestEngine(Class<?> clazz) {
 	this.clazz = clazz;
     }
 
     public void doTesting() {
+	resetStatistics();
 	extractMetadataForTesting();
 
 	for (String testMethod : testMethods) {
@@ -53,19 +55,23 @@ public class MyTestEngine {
     }
 
     private void extractMetadataForTesting() {
-	Method[] methods = clazz.getMethods();
-	for (Method method : methods) {
-	    Annotation[] annotations = method.getAnnotations();
-	    for (Annotation annotation : annotations) {
-		if (annotation instanceof Before) {
-		    beforeMethods.add(method.getName());
-		} else if (annotation instanceof After) {
-		    afterMethods.add(method.getName());
-		} else if (annotation instanceof Test) {
-		    testMethods.add(method.getName());
+	if (!metadataExtracted) {
+	    Method[] methods = clazz.getMethods();
+	    for (Method method : methods) {
+		Annotation[] annotations = method.getAnnotations();
+		for (Annotation annotation : annotations) {
+		    if (annotation instanceof Before) {
+			beforeMethods.add(method.getName());
+		    } else if (annotation instanceof After) {
+			afterMethods.add(method.getName());
+		    } else if (annotation instanceof Test) {
+			testMethods.add(method.getName());
+		    }
 		}
 	    }
+	    metadataExtracted = true;
 	}
+
     }
 
     private void printTestingStatistics() {
@@ -74,6 +80,11 @@ public class MyTestEngine {
 	System.out.println("Number of successfully performed tests: "
 		+ Integer.valueOf(getPerformedTestsCount() - getFailedTestsCount()).toString());
 	System.out.println("Number of falied tests: " + Integer.valueOf(getFailedTestsCount()).toString());
+    }
+
+    private void resetStatistics() {
+	performedTestsCounter = 0;
+	failedTestsCounter = 0;
     }
 
     private int getPerformedTestsCount() {
