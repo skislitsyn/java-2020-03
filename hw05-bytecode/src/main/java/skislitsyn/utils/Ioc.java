@@ -3,7 +3,6 @@ package skislitsyn.utils;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import skislitsyn.logging.Log;
@@ -12,36 +11,30 @@ public class Ioc {
     private Ioc() {
     }
 
-    public static Object createMyClass(Object obj) {
+    @SuppressWarnings("unchecked")
+    public static <T> T createMyProxy(T obj) {
 	InvocationHandler handler = new MyInvocationHandler(obj);
-	return Proxy.newProxyInstance(Ioc.class.getClassLoader(), obj.getClass().getInterfaces(), handler);
+	return (T) Proxy.newProxyInstance(Ioc.class.getClassLoader(), obj.getClass().getInterfaces(), handler);
     }
 
     static class MyInvocationHandler implements InvocationHandler {
-	private final Object myClass;
-	private final HashMap<Class<?>, HashSet<Method>> loggableInterfaces = new HashMap<>();
+	private final Object myObj;
+	private final HashSet<Method> loggableMethods = new HashSet<>();
 
-	MyInvocationHandler(Object myClass) {
-	    this.myClass = myClass;
-	    Method[] methods = myClass.getClass().getDeclaredMethods();
+	MyInvocationHandler(Object myObj) {
+	    this.myObj = myObj;
+	    Method[] methods = myObj.getClass().getDeclaredMethods();
 	    for (Method method : methods) {
 		if (method.isAnnotationPresent(Log.class)) {
-		    Class<?>[] interfaces = myClass.getClass().getInterfaces();
+		    Class<?>[] interfaces = myObj.getClass().getInterfaces();
 		    for (Class<?> i : interfaces) {
 			try {
 			    Method interfaceMethod = i.getDeclaredMethod(method.getName(), method.getParameterTypes());
-			    HashSet<Method> methodsSet = null;
-			    if (loggableInterfaces.containsKey(i)) {
-				methodsSet = loggableInterfaces.get(i);
-			    } else {
-				methodsSet = new HashSet<>();
-			    }
-			    methodsSet.add(interfaceMethod);
-			    loggableInterfaces.put(i, methodsSet);
+			    loggableMethods.add(interfaceMethod);
 			} catch (NoSuchMethodException e) {
 			    // Interface do not have the method with annotation Log
-			} catch (SecurityException e) {
-			    throw new RuntimeException(e.getMessage());
+			} catch (Exception e) {
+			    throw new RuntimeException(e);
 			}
 		    }
 		}
@@ -50,16 +43,15 @@ public class Ioc {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-	    if (loggableInterfaces.get(method.getDeclaringClass()) != null
-		    && loggableInterfaces.get(method.getDeclaringClass()).contains(method)) {
+	    if (loggableMethods.contains(method)) {
 		System.out.println("executed method: " + method.getName() + ", param: " + getPrintableArgs(args));
 	    }
-	    return method.invoke(myClass, args);
+	    return method.invoke(myObj, args);
 	}
 
 	@Override
 	public String toString() {
-	    return "MyInvocationHandler{" + "myClass=" + myClass + '}';
+	    return "MyInvocationHandler{" + "myClass=" + myObj + '}';
 	}
     }
 

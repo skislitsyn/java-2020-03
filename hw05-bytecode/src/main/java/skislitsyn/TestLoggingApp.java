@@ -8,29 +8,26 @@ public class TestLoggingApp {
 
     public static void main(String[] args) {
 	System.out.println("Launch test with logging:");
-	LoggableCalculator testWithLogging = (LoggableCalculator) Ioc.createMyClass(new TestWithLogging());
-	testWithLogging.calculation(1);
-	testWithLogging.calculation(2);
-	testWithLogging.calculation(3);
+	LoggableCalculator testLogging = Ioc.createMyProxy(new TestLogging());
+	testLogging.calculation(1);
+	testLogging.calculation(2);
+	testLogging.calculation(3);
 
 	System.out.println("Launch test without logging:");
-	LoggableCalculator testWithOutLogging = (LoggableCalculator) Ioc.createMyClass(new TestWithOutLogging());
-	testWithOutLogging.calculation(1);
-	testWithOutLogging.calculation(2);
-	testWithOutLogging.calculation(3);
+	testLogging.calculationWithoutAnnotation(1);
+	testLogging.calculationWithoutAnnotation(2);
+	testLogging.calculationWithoutAnnotation(3);
 
 	System.out.println("Launch another test with logging:");
-	LoggablePrinter anotherTestWithLogging = (LoggablePrinter) Ioc.createMyClass(new AnotherTestWithLogging());
-	anotherTestWithLogging.print(String.valueOf(4));
-	anotherTestWithLogging.print(String.valueOf(5));
-	anotherTestWithLogging.print(String.valueOf(6));
+	LoggablePrinter anotherTestLogging = Ioc.createMyProxy(new AnotherTestLogging());
+	anotherTestLogging.print(String.valueOf(4));
+	anotherTestLogging.print(String.valueOf(5));
+	anotherTestLogging.print(String.valueOf(6));
 
 	System.out.println("Launch another test without logging:");
-	LoggablePrinter anotherTestWithOutLogging = (LoggablePrinter) Ioc
-		.createMyClass(new AnotherTestWithOutLogging());
-	anotherTestWithOutLogging.print(String.valueOf(4));
-	anotherTestWithOutLogging.print(String.valueOf(5));
-	anotherTestWithOutLogging.print(String.valueOf(6));
+	anotherTestLogging.printWithoutAnnotation(String.valueOf(4));
+	anotherTestLogging.printWithoutAnnotation(String.valueOf(5));
+	anotherTestLogging.printWithoutAnnotation(String.valueOf(6));
     }
 
 }
