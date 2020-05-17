@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashSet;
+import java.util.Set;
 
 import skislitsyn.logging.Log;
 
@@ -13,20 +14,20 @@ public class Ioc {
 
     @SuppressWarnings("unchecked")
     public static <T> T createMyProxy(T obj) {
-	InvocationHandler handler = new MyInvocationHandler(obj);
+	InvocationHandler handler = new InvocationHandlerImpl(obj);
 	return (T) Proxy.newProxyInstance(Ioc.class.getClassLoader(), obj.getClass().getInterfaces(), handler);
     }
 
-    static class MyInvocationHandler implements InvocationHandler {
-	private final Object myObj;
-	private final HashSet<Method> loggableMethods = new HashSet<>();
+    static class InvocationHandlerImpl implements InvocationHandler {
+	private final Object obj;
+	private final Set<Method> loggableMethods = new HashSet<>();
 
-	MyInvocationHandler(Object myObj) {
-	    this.myObj = myObj;
-	    Method[] methods = myObj.getClass().getDeclaredMethods();
+	InvocationHandlerImpl(Object obj) {
+	    this.obj = obj;
+	    Method[] methods = obj.getClass().getDeclaredMethods();
 	    for (Method method : methods) {
 		if (method.isAnnotationPresent(Log.class)) {
-		    Class<?>[] interfaces = myObj.getClass().getInterfaces();
+		    Class<?>[] interfaces = obj.getClass().getInterfaces();
 		    for (Class<?> i : interfaces) {
 			try {
 			    Method interfaceMethod = i.getDeclaredMethod(method.getName(), method.getParameterTypes());
@@ -46,12 +47,12 @@ public class Ioc {
 	    if (loggableMethods.contains(method)) {
 		System.out.println("executed method: " + method.getName() + ", param: " + getPrintableArgs(args));
 	    }
-	    return method.invoke(myObj, args);
+	    return method.invoke(obj, args);
 	}
 
 	@Override
 	public String toString() {
-	    return "MyInvocationHandler{" + "myClass=" + myObj + '}';
+	    return "MyInvocationHandler{" + "myClass=" + obj + '}';
 	}
     }
 
