@@ -5,15 +5,20 @@ import java.util.List;
 
 import skislitsyn.Banknote;
 import skislitsyn.CashBasket;
-import skislitsyn.FaceValue;
+import skislitsyn.Nominal;
 
 public class CashBasketImpl implements CashBasket {
     private static final int MAX_QUANTITY = 100;
-    private final FaceValue faceValue;
+    private final Nominal nominal;
     private int currentQuantity = 0;
 
-    public CashBasketImpl(FaceValue faceValue) {
-	this.faceValue = faceValue;
+    public CashBasketImpl(Nominal nominal) {
+	this.nominal = nominal;
+    }
+
+    public CashBasketImpl(Nominal nominal, int currentQuantity) {
+	this.nominal = nominal;
+	this.currentQuantity = currentQuantity;
     }
 
     @Override
@@ -25,19 +30,25 @@ public class CashBasketImpl implements CashBasket {
     public List<Banknote> getBanknotes(int quantity) {
 	List<Banknote> banknotesRequested = new ArrayList<>();
 	for (int i = 0; i < quantity; i++) {
-	    banknotesRequested.add(new BanknoteImpl(faceValue));
+	    banknotesRequested.add(new BanknoteImpl(nominal));
+	    currentQuantity--;
 	}
 	return banknotesRequested;
     }
 
     @Override
-    public FaceValue getFaceValue() {
-	return faceValue;
+    public Nominal getNominal() {
+	return nominal;
     }
 
     @Override
     public int getCurrentQuantity() {
 	return currentQuantity;
+    }
+
+    @Override
+    public boolean isLoadAvailable(int quantity) {
+	return currentQuantity + quantity <= MAX_QUANTITY;
     }
 
     @Override

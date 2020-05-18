@@ -1,27 +1,27 @@
 package skislitsyn.impl;
 
 import skislitsyn.Banknote;
-import skislitsyn.FaceValue;
+import skislitsyn.Nominal;
 
 public class BanknoteImpl implements Banknote {
-    private final FaceValue faceValue;
+    private final Nominal nominal;
 
-    public BanknoteImpl(FaceValue faceValue) {
-	this.faceValue = faceValue;
+    public BanknoteImpl(Nominal nominal) {
+	this.nominal = nominal;
     }
 
     public BanknoteImpl(int value) {
-	this.faceValue = FaceValue.getFromValue(value);
+	this.nominal = Nominal.getFromValue(value);
     }
 
     @Override
-    public FaceValue getFaceValue() {
-	return faceValue;
+    public Nominal getNominal() {
+	return nominal;
     }
 
     @Override
     public int getValue() {
-	return faceValue.getValue();
+	return nominal.getValue();
     }
 
 }

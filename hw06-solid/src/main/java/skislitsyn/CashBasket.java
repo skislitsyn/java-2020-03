@@ -7,9 +7,11 @@ public interface CashBasket {
 
     public List<Banknote> getBanknotes(int quantity);
 
-    public FaceValue getFaceValue();
+    public Nominal getNominal();
 
     public int getCurrentQuantity();
+
+    public boolean isLoadAvailable(int quantity);
 
     public boolean isAvailable(int quantity);
 

@@ -1,7 +1,7 @@
 package skislitsyn;
 
 public interface Banknote {
-    public FaceValue getFaceValue();
+    public Nominal getNominal();
 
     public int getValue();
 }

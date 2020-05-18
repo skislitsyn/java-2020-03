@@ -1,11 +1,11 @@
 package skislitsyn;
 
-public enum FaceValue {
+public enum Nominal {
     N5000(5000), N2000(2000), N1000(1000), N500(500), N100(100), N50(50), N10(10);
 
     private int value;
 
-    FaceValue(int value) {
+    Nominal(int value) {
 	this.value = value;
     }
 
@@ -13,7 +13,7 @@ public enum FaceValue {
 	return value;
     }
 
-    public static FaceValue getFromValue(int value) {
+    public static Nominal getFromValue(int value) {
 	switch (value) {
 	case 5000: {
 	    return N5000;
