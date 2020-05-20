@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import skislitsyn.ATM;
 import skislitsyn.Banknote;
@@ -27,13 +25,13 @@ import skislitsyn.Nominal;
  *
  */
 public class ATMImpl implements ATM {
-    private final Set<Nominal> nominalsAvailable;
+    private final Map<Integer, Nominal> nominalsAvailable = new TreeMap<>(Comparator.reverseOrder());
     private final Set<CashBasket> cashBacketsAvailable = new HashSet<>();
     private final Map<Nominal, CashBasket> nominalsCashBacketsMap = new HashMap<>();
 
     public ATMImpl(Set<Nominal> nominalsAvailable) {
-	this.nominalsAvailable = nominalsAvailable;
 	for (Nominal nominal : nominalsAvailable) {
+	    this.nominalsAvailable.put(nominal.getValue(), nominal);
 	    CashBasket cashBasket = new CashBasketImpl(nominal);
 	    cashBacketsAvailable.add(cashBasket);
 	    nominalsCashBacketsMap.put(nominal, cashBasket);
@@ -42,7 +40,7 @@ public class ATMImpl implements ATM {
 
     @Override
     public void doCashIn(List<Banknote> banknotes) throws IOException {
-	Map<Nominal, List<Banknote>> banknotesForLoad = new HashMap<>();
+	Map<Nominal, Integer> banknotesForLoad = new HashMap<>();
 
 	for (Banknote banknote : banknotes) {
 	    checkBanknoteCashInAvailable(banknote);
@@ -57,6 +55,10 @@ public class ATMImpl implements ATM {
     public List<Banknote> doCashOut(long amountRequested) throws IOException {
 	SortedMap<Integer, Map<Nominal, Integer>> cashOutOptions = getCashOutOptions(amountRequested);
 
+	if (cashOutOptions.isEmpty()) {
+	    throw new IOException("Amount requested can not be cashed out: no proper banknote nominal");
+	}
+
 	boolean cashOutAvailable = false;
 	for (Integer optionId : cashOutOptions.keySet()) {
 	    if (isCashOutAvailable(cashOutOptions.get(optionId))) {
@@ -65,7 +67,7 @@ public class ATMImpl implements ATM {
 	}
 
 	if (!cashOutAvailable) {
-	    throw new IOException("Amount requested can not be cashed out: cash is over");
+	    throw new IOException("Amount requested can not be cashed out: amount requested is too high");
 	}
 
 	return null;
@@ -81,92 +83,76 @@ public class ATMImpl implements ATM {
     }
 
     private void checkBanknoteCashInAvailable(Banknote banknote) throws IOException {
-	if (!nominalsAvailable.contains(banknote.getNominal())) {
+	if (!nominalsAvailable.values().contains(banknote.getNominal())) {
 	    throw new IOException("Banknotes with this nominal can not be cashed in");
 	}
     }
 
-    private void addBanknoteForLoad(Map<Nominal, List<Banknote>> banknotesForLoad, Banknote banknote) {
-	List<Banknote> banknotes;
-	if (banknotesForLoad.containsKey(banknote.getNominal())) {
-	    banknotes = banknotesForLoad.get(banknote.getNominal());
-	} else {
-	    banknotes = new ArrayList<>();
-	}
-	banknotes.add(banknote);
-	banknotesForLoad.put(banknote.getNominal(), banknotes);
+    private void addBanknoteForLoad(Map<Nominal, Integer> banknotesForLoad, Banknote banknote) {
+	int currentQuantity = banknotesForLoad.containsKey(banknote.getNominal())
+		? banknotesForLoad.get(banknote.getNominal())
+		: 0;
+	banknotesForLoad.put(banknote.getNominal(), currentQuantity + 1);
     }
 
-    private void checkLoadAvailable(Map<Nominal, List<Banknote>> banknotesForLoad) throws IOException {
-	try {
-	    cashBacketsAvailable.forEach(cashBacket -> {
-		if (banknotesForLoad.get(cashBacket.getNominal()) != null) {
-		    if (!cashBacket.isLoadAvailable(banknotesForLoad.get(cashBacket.getNominal()).size())) {
-			throw new RuntimeException("Banknotes can not be loaded");
-		    }
-		}
-		;
-	    });
-	} catch (Exception e) {
-	    throw new IOException(e);
-	}
-    }
-
-    private void load(Map<Nominal, List<Banknote>> banknotesForLoad) {
-	cashBacketsAvailable.forEach(cashBacket -> {
-	    if (banknotesForLoad.get(cashBacket.getNominal()) != null) {
-		cashBacket.loadBanknotes(banknotesForLoad.get(cashBacket.getNominal()));
+    private void checkLoadAvailable(Map<Nominal, Integer> banknotesForLoad) throws IOException {
+	for (Nominal nominal : banknotesForLoad.keySet()) {
+	    if (!nominalsCashBacketsMap.get(nominal).isLoadAvailable(banknotesForLoad.get(nominal))) {
+		throw new IOException("Banknotes can not be loaded");
 	    }
-	    ;
-	});
+	}
+    }
+
+    private void load(Map<Nominal, Integer> banknotesForLoad) {
+	for (Nominal nominal : banknotesForLoad.keySet()) {
+	    nominalsCashBacketsMap.get(nominal).loadBanknotes(banknotesForLoad.get(nominal));
+	}
     }
 
     /*
-     * Получаем варианты выдачи наличных, разложенные в зависимости от доступной
-     * купюры максимального номинала. Перебираем все доступные номиналы купюр,
-     * начиная с наибольшего, и в каждой итерации спускаемся к следующему меньшему
-     * номиналу.
+     * РџРѕР»СѓС‡Р°РµРј РІР°СЂРёР°РЅС‚С‹ РІС‹РґР°С‡Рё РЅР°Р»РёС‡РЅС‹С…, СЂР°Р·Р»РѕР¶РµРЅРЅС‹Рµ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РґРѕСЃС‚СѓРїРЅРѕР№
+     * РєСѓРїСЋСЂС‹ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РЅРѕРјРёРЅР°Р»Р°. РџРµСЂРµР±РёСЂР°РµРј РІСЃРµ РґРѕСЃС‚СѓРїРЅС‹Рµ РЅРѕРјРёРЅР°Р»С‹ РєСѓРїСЋСЂ,
+     * РЅР°С‡РёРЅР°СЏ СЃ РЅР°РёР±РѕР»СЊС€РµРіРѕ, Рё РІ РєР°Р¶РґРѕР№ РёС‚РµСЂР°С†РёРё СЃРїСѓСЃРєР°РµРјСЃСЏ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ РјРµРЅСЊС€РµРјСѓ
+     * РЅРѕРјРёРЅР°Р»Сѓ.
      */
     private SortedMap<Integer, Map<Nominal, Integer>> getCashOutOptions(long amountRequested) throws IOException {
 	SortedMap<Integer, Map<Nominal, Integer>> cashOutOptions = new TreeMap<>();
+	List<Integer> nominalsValues = new ArrayList<>();
+	nominalsValues.addAll(nominalsAvailable.keySet());
 
-	Set<Nominal> nominals = new HashSet<>(nominalsAvailable);
-	SortedSet<Integer> nominalsValues = new TreeSet<>(Comparator.reverseOrder());
-	for (Nominal nominal : nominals) {
-	    nominalsValues.add(nominal.getValue());
-	}
-
-	for (int i = 0; i < nominals.size(); i++) {
-	    boolean nominalSkipped = false;
-	    long amountRequestedRest = amountRequested;
-	    Map<Nominal, Integer> nominalsQuantityMap = new HashMap<>();
-	    for (Integer nominalsValue : nominalsValues) {
-		if (amountRequestedRest >= nominalsValue) {
-		    nominalsQuantityMap.put(Nominal.getFromValue(nominalsValue),
-			    (int) (amountRequestedRest / nominalsValue));
-		    amountRequestedRest %= nominalsValue;
-		    if (amountRequestedRest == 0) {
-			break;
-		    }
-		} else {
-		    nominalSkipped = true;
-		    break;
+	int optionId = 0;
+	int optionsCount = nominalsAvailable.size();
+	for (int i = 0; i < optionsCount; i++) {
+	    int highestNominal = nominalsValues.get(0);
+	    if (amountRequested >= highestNominal) {
+		Map<Nominal, Integer> cashOutOption = getCashOutOption(amountRequested, nominalsValues);
+		if (cashOutOption != null) {
+		    cashOutOptions.put(optionId, cashOutOption);
+		    optionId++;
 		}
 	    }
-	    if (!nominalSkipped) {
-		if (amountRequestedRest != 0) {
-		    throw new IOException("Amount requested can not be cashed out");
-		}
-		cashOutOptions.put(cashOutOptions.size(), nominalsQuantityMap);
-	    }
-	    nominalsValues.remove(nominalsValues.first());
-	}
-
-	if (cashOutOptions.isEmpty()) {
-	    throw new IOException("Amount requested can not be cashed out");
+	    nominalsValues.remove(0);
 	}
 
 	return cashOutOptions;
+    }
+
+    /*
+     * РџС‹С‚Р°РµРјСЃСЏ СЂР°Р·Р»РѕР¶РёС‚СЊ СЃСѓРјРјСѓ РїРѕ РєСѓРїСЋСЂР°Рј РґРѕСЃС‚СѓРїРЅРѕРіРѕ РЅРѕРјРёРЅР°Р»Р°. Р•СЃР»Рё РЅРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ,
+     * РІРѕР·РІСЂР°С‰Р°РµРј null
+     */
+    private Map<Nominal, Integer> getCashOutOption(long amountRequested, List<Integer> nominalsValues)
+	    throws IOException {
+	Map<Nominal, Integer> nominalsQuantityMap = new HashMap<>();
+	long amountRequestedRest = amountRequested;
+	for (Integer nominalsValue : nominalsValues) {
+	    nominalsQuantityMap.put(Nominal.getFromValue(nominalsValue), (int) (amountRequestedRest / nominalsValue));
+	    amountRequestedRest %= nominalsValue;
+	    if (amountRequestedRest == 0) {
+		return nominalsQuantityMap;
+	    }
+	}
+	return null;
     }
 
     private boolean isCashOutAvailable(Map<Nominal, Integer> option) {
@@ -181,7 +167,16 @@ public class ATMImpl implements ATM {
     private List<Banknote> getCash(Map<Nominal, Integer> option) {
 	List<Banknote> result = new ArrayList<>();
 	for (Nominal nominal : option.keySet()) {
-	    result.addAll(nominalsCashBacketsMap.get(nominal).getBanknotes(option.get(nominal)));
+	    result.addAll(getBanknotes(nominal, nominalsCashBacketsMap.get(nominal).getBanknotes(option.get(nominal))));
+	}
+	return result;
+    }
+
+    private List<Banknote> getBanknotes(Nominal nominal, int quantuty) {
+	List<Banknote> result = new ArrayList<>();
+	Banknote banknote = new BanknoteImpl(nominal);
+	for (int i = 0; i < quantuty; i++) {
+	    result.add(banknote);
 	}
 	return result;
     }

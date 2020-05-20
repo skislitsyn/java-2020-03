@@ -20,8 +20,16 @@ public class ATMApp {
 	// Load banknotes
 	loadBanknotes(atm, atmNominalsAvailable);
 
-	// Normally get some amount
+	// Normally get some amounts
 	getAmount(atm, 14500);
+	getRest(atm);
+	getAmount(atm, 4000);
+	getRest(atm);
+	getAmount(atm, 3500);
+	getRest(atm);
+
+	// Get some invalid amount
+	getAmount(atm, 5100);
 	getRest(atm);
 
 	// Get some invalid (low) amount

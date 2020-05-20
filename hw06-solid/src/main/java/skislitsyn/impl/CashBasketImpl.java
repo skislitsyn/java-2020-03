@@ -1,9 +1,5 @@
 package skislitsyn.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import skislitsyn.Banknote;
 import skislitsyn.CashBasket;
 import skislitsyn.Nominal;
 
@@ -22,18 +18,14 @@ public class CashBasketImpl implements CashBasket {
     }
 
     @Override
-    public void loadBanknotes(List<Banknote> banknotes) {
-	currentQuantity += banknotes.size();
+    public void loadBanknotes(int quantity) {
+	currentQuantity += quantity;
     }
 
     @Override
-    public List<Banknote> getBanknotes(int quantity) {
-	List<Banknote> banknotesRequested = new ArrayList<>();
-	for (int i = 0; i < quantity; i++) {
-	    banknotesRequested.add(new BanknoteImpl(nominal));
-	    currentQuantity--;
-	}
-	return banknotesRequested;
+    public int getBanknotes(int quantity) {
+	currentQuantity -= quantity;
+	return quantity;
     }
 
     @Override

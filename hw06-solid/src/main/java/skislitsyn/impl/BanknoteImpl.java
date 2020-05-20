@@ -20,8 +20,7 @@ public class BanknoteImpl implements Banknote {
     }
 
     @Override
-    public int getValue() {
-	return nominal.getValue();
+    public String toString() {
+	return "BanknoteImpl{" + "nominal=" + nominal + '}';
     }
-
 }

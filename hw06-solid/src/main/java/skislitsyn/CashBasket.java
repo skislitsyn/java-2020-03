@@ -1,11 +1,9 @@
 package skislitsyn;
 
-import java.util.List;
-
 public interface CashBasket {
-    public void loadBanknotes(List<Banknote> banknotes);
+    public void loadBanknotes(int quantity);
 
-    public List<Banknote> getBanknotes(int quantity);
+    public int getBanknotes(int quantity);
 
     public Nominal getNominal();
 
