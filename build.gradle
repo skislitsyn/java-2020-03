@@ -3,19 +3,23 @@ plugins {
     id 'eclipse'
     id "io.spring.dependency-management" version "1.0.9.RELEASE"
     id 'com.github.johnrengelman.shadow' version '5.2.0' apply false
+    id 'maven'
 }
 
 allprojects {
     group "skislitsyn"
     
     repositories {
+    	mavenLocal()
         mavenCentral()
     }
     
     apply plugin: "io.spring.dependency-management"
+    apply plugin: "maven"
     dependencyManagement {
         dependencies {
             dependency("com.google.guava:guava:28.2-jre")
+            dependency("org.apache.commons:commons-lang3:3.10")
         }
     }
 }

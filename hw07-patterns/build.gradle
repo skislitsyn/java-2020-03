@@ -1,23 +1,22 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow'
-    id 'maven'
 }
 
 sourceCompatibility = JavaVersion.VERSION_13
 targetCompatibility = JavaVersion.VERSION_13
 
-version = "0.1"
-
 dependencies {
+	implementation 'skislitsyn:hw06-solid:0.1'
+	implementation 'org.apache.commons:commons-lang3'
 }
 
 shadowJar {
-    archiveBaseName.set('hw06-solid')
+    archiveBaseName.set('hw07-patterns')
     archiveVersion.set('0.1')
     archiveClassifier.set('')
     manifest {
-        attributes 'Main-Class': 'skislitsyn.ATMApp'
+        attributes 'Main-Class': 'skislitsyn.ATMDepartmentApp'
     }
 }
 
