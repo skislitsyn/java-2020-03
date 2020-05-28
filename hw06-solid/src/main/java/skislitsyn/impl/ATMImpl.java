@@ -25,6 +25,7 @@ import skislitsyn.Nominal;
  *
  */
 public class ATMImpl implements ATM {
+    private static final long serialVersionUID = 1L;
     private final Map<Integer, Nominal> nominalsAvailable = new TreeMap<>(Comparator.reverseOrder());
     private final Set<CashBasket> cashBacketsAvailable = new HashSet<>();
     private final Map<Nominal, CashBasket> nominalsCashBacketsMap = new HashMap<>();

@@ -1,9 +1,12 @@
 package skislitsyn.impl;
 
+import java.io.Serializable;
+
 import skislitsyn.CashBasket;
 import skislitsyn.Nominal;
 
-public class CashBasketImpl implements CashBasket {
+public class CashBasketImpl implements CashBasket, Serializable {
+    private static final long serialVersionUID = 1L;
     private static final int MAX_QUANTITY = 100;
     private final Nominal nominal;
     private int currentQuantity = 0;
