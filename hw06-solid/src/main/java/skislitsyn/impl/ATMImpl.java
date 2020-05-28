@@ -1,7 +1,6 @@
 package skislitsyn.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,7 +24,7 @@ import skislitsyn.Nominal;
  * @author Sergey
  *
  */
-public class ATMImpl implements ATM, Serializable {
+public class ATMImpl implements ATM {
     private static final long serialVersionUID = 1L;
     private final Map<Integer, Nominal> nominalsAvailable = new TreeMap<>(Comparator.reverseOrder());
     private final Set<CashBasket> cashBacketsAvailable = new HashSet<>();

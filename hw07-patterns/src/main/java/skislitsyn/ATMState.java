@@ -1,26 +1,24 @@
 package skislitsyn;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang3.SerializationUtils;
 
 public class ATMState {
-    private final ATM[] atms;
+    private final ATM atm;
 
-    public ATMState(ATM[] atms) {
-	this.atms = atms;
+    public ATMState(ATM atm) {
+	this.atm = atm;
     }
 
     public ATMState(ATMState state) {
-	this.atms = SerializationUtils.clone(state.getATMs());
+	this.atm = SerializationUtils.clone(state.getATM());
     }
 
-    public ATM[] getATMs() {
-	return atms;
+    public ATM getATM() {
+	return atm;
     }
 
     @Override
     public String toString() {
-	return "ATMState{" + "atms=" + (atms == null ? null : Arrays.asList(atms)) + '}';
+	return "ATMState{" + "atm=" + atm + '}';
     }
 }

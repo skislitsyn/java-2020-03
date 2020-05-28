@@ -1,19 +1,19 @@
 package skislitsyn.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import skislitsyn.Banknote;
 import skislitsyn.Nominal;
 import skislitsyn.model.ATMModel;
 
-public class ATMM200 extends ATMImpl implements Serializable {
+public class ATMM200 extends ATMImpl {
     private static final long serialVersionUID = 1L;
     ATMModel model = ATMModel.M200;
 
-    public ATMM200(Set<Nominal> nominalsAvailable) {
+    public ATMM200(Set<Nominal> nominalsAvailable, Map<String, String> config) {
 	super(nominalsAvailable);
     }
 

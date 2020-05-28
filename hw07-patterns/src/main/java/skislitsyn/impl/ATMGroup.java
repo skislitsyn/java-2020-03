@@ -14,6 +14,10 @@ public class ATMGroup implements ATM {
 	this.atms.add(atm);
     }
 
+    public void replaceATM(ATM oldATM, ATM newATM) {
+	this.atms.set(atms.indexOf(oldATM), newATM);
+    }
+
     @Override
     public void doCashIn(List<Banknote> banknotes) throws IOException {
 	for (ATM atm : atms) {
