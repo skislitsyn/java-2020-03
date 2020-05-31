@@ -20,6 +20,8 @@ allprojects {
         dependencies {
             dependency("com.google.guava:guava:28.2-jre")
             dependency("org.apache.commons:commons-lang3:3.10")
+            dependency("com.google.code.gson:gson:2.7")
+            dependency("org.glassfish:javax.json:1.1.4")
         }
     }
 }
