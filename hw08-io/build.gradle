@@ -10,15 +10,28 @@ dependencies {
 	implementation 'com.google.code.gson:gson'
     implementation 'org.glassfish:javax.json'
     implementation 'org.apache.commons:commons-lang3'
+    
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
+    testImplementation group: 'org.assertj', name: 'assertj-core'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.with {
+        encoding = 'UTF-8'
+    }
 }
 
 shadowJar {
     archiveBaseName.set('hw08-io')
     archiveVersion.set('0.1')
     archiveClassifier.set('')
-    manifest {
-        attributes 'Main-Class': 'skislitsyn.MyGsonTestingApp'
-    }
 }
-
-tasks.build.dependsOn tasks.shadowJar
