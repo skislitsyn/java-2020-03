@@ -10,8 +10,8 @@ import ru.otus.jdbc.mapper.EntitySQLMetaData;
 public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
     private final EntityClassMetaData<T> entityClassMetaData;
 
-    public EntitySQLMetaDataImpl(Class<T> clazz) {
-	entityClassMetaData = new EntityClassMetaDataImpl<T>(clazz);
+    public EntitySQLMetaDataImpl(EntityClassMetaData<T> entityClassMetaData) {
+	this.entityClassMetaData = entityClassMetaData;
     }
 
     @Override

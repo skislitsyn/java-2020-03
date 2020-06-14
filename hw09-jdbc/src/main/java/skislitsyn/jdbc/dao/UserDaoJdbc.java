@@ -1,6 +1,5 @@
 package skislitsyn.jdbc.dao;
 
-import java.sql.Connection;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -10,23 +9,19 @@ import ru.otus.core.dao.UserDao;
 import ru.otus.core.dao.UserDaoException;
 import ru.otus.core.model.User;
 import ru.otus.core.sessionmanager.SessionManager;
-import ru.otus.jdbc.DbExecutorImpl;
 import ru.otus.jdbc.mapper.JdbcMapper;
 import ru.otus.jdbc.sessionmanager.SessionManagerJdbc;
-import skislitsyn.jdbc.mapper.JdbcMapperImpl;
 
 public class UserDaoJdbc implements UserDao {
     private static final Logger logger = LoggerFactory.getLogger(UserDaoJdbc.class);
 
     private final SessionManagerJdbc sessionManager;
-    private final DbExecutorImpl<User> dbExecutor;
     private final Class<User> clazz = User.class;
     private final JdbcMapper<User> jdbcMapper;
 
-    public UserDaoJdbc(SessionManagerJdbc sessionManager, DbExecutorImpl<User> dbExecutor) {
+    public UserDaoJdbc(SessionManagerJdbc sessionManager, JdbcMapper<User> jdbcMapper) {
 	this.sessionManager = sessionManager;
-	this.dbExecutor = dbExecutor;
-	jdbcMapper = new JdbcMapperImpl<User>(sessionManager, dbExecutor, clazz);
+	this.jdbcMapper = jdbcMapper;
     }
 
     @Override
@@ -51,10 +46,6 @@ public class UserDaoJdbc implements UserDao {
     @Override
     public SessionManager getSessionManager() {
 	return sessionManager;
-    }
-
-    private Connection getConnection() {
-	return sessionManager.getCurrentSession().getConnection();
     }
 
     @Override

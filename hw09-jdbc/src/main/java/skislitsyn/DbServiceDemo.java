@@ -13,12 +13,18 @@ import ru.otus.core.service.DBServiceUser;
 import ru.otus.core.service.DbServiceUserImpl;
 import ru.otus.h2.DataSourceH2;
 import ru.otus.jdbc.DbExecutorImpl;
+import ru.otus.jdbc.mapper.EntityClassMetaData;
+import ru.otus.jdbc.mapper.EntitySQLMetaData;
+import ru.otus.jdbc.mapper.JdbcMapper;
 import ru.otus.jdbc.sessionmanager.SessionManagerJdbc;
 import skislitsyn.core.model.Account;
 import skislitsyn.core.service.DBServiceAccount;
 import skislitsyn.core.service.DbServiceAccountImpl;
 import skislitsyn.jdbc.dao.AccountDaoJdbc;
 import skislitsyn.jdbc.dao.UserDaoJdbc;
+import skislitsyn.jdbc.mapper.EntityClassMetaDataImpl;
+import skislitsyn.jdbc.mapper.EntitySQLMetaDataImpl;
+import skislitsyn.jdbc.mapper.JdbcMapperImpl;
 
 public class DbServiceDemo {
     private static final Logger logger = LoggerFactory.getLogger(DbServiceDemo.class);
@@ -30,14 +36,22 @@ public class DbServiceDemo {
 	demo.createTables(dataSource);
 
 	var sessionManager = new SessionManagerJdbc(dataSource);
-	DbExecutorImpl<User> dbExecutor = new DbExecutorImpl<>();
-	var userDao = new UserDaoJdbc(sessionManager, dbExecutor);
+	DbExecutorImpl<User> dbExecutorUser = new DbExecutorImpl<>();
+	EntityClassMetaData<User> entityClassMetaDataUser = new EntityClassMetaDataImpl<>(User.class);
+	EntitySQLMetaData entitySQLMetaDataUser = new EntitySQLMetaDataImpl<User>(entityClassMetaDataUser);
+	JdbcMapper<User> jdbcMapperUser = new JdbcMapperImpl<User>(sessionManager, dbExecutorUser, User.class,
+		entityClassMetaDataUser, entitySQLMetaDataUser);
+	var userDao = new UserDaoJdbc(sessionManager, jdbcMapperUser);
 
 	var dbServiceUser = new DbServiceUserImpl(userDao);
 	demo.testUserService(dbServiceUser);
 
 	DbExecutorImpl<Account> dbExecutorAccount = new DbExecutorImpl<>();
-	var accountDao = new AccountDaoJdbc(sessionManager, dbExecutorAccount);
+	EntityClassMetaData<Account> entityClassMetaDataAccount = new EntityClassMetaDataImpl<>(Account.class);
+	EntitySQLMetaData entitySQLMetaDataAccount = new EntitySQLMetaDataImpl<Account>(entityClassMetaDataAccount);
+	JdbcMapper<Account> jdbcMapperAccount = new JdbcMapperImpl<Account>(sessionManager, dbExecutorAccount,
+		Account.class, entityClassMetaDataAccount, entitySQLMetaDataAccount);
+	var accountDao = new AccountDaoJdbc(sessionManager, jdbcMapperAccount);
 
 	var dbServiceAccount = new DbServiceAccountImpl(accountDao);
 	demo.testAccountService(dbServiceAccount);

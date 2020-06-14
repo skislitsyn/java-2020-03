@@ -1,32 +1,27 @@
 package skislitsyn.jdbc.dao;
 
-import java.sql.Connection;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.otus.core.sessionmanager.SessionManager;
-import ru.otus.jdbc.DbExecutorImpl;
 import ru.otus.jdbc.mapper.JdbcMapper;
 import ru.otus.jdbc.sessionmanager.SessionManagerJdbc;
 import skislitsyn.core.dao.AccountDao;
 import skislitsyn.core.dao.AccountDaoException;
 import skislitsyn.core.model.Account;
-import skislitsyn.jdbc.mapper.JdbcMapperImpl;
 
 public class AccountDaoJdbc implements AccountDao {
     private static final Logger logger = LoggerFactory.getLogger(AccountDaoJdbc.class);
 
     private final SessionManagerJdbc sessionManager;
-    private final DbExecutorImpl<Account> dbExecutor;
     private final Class<Account> clazz = Account.class;
     private final JdbcMapper<Account> jdbcMapper;
 
-    public AccountDaoJdbc(SessionManagerJdbc sessionManager, DbExecutorImpl<Account> dbExecutor) {
+    public AccountDaoJdbc(SessionManagerJdbc sessionManager, JdbcMapper<Account> jdbcMapper) {
 	this.sessionManager = sessionManager;
-	this.dbExecutor = dbExecutor;
-	jdbcMapper = new JdbcMapperImpl<Account>(sessionManager, dbExecutor, clazz);
+	this.jdbcMapper = jdbcMapper;
     }
 
     @Override
@@ -51,10 +46,6 @@ public class AccountDaoJdbc implements AccountDao {
     @Override
     public SessionManager getSessionManager() {
 	return sessionManager;
-    }
-
-    private Connection getConnection() {
-	return sessionManager.getCurrentSession().getConnection();
     }
 
     @Override
