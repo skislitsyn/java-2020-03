@@ -24,11 +24,23 @@ allprojects {
             dependency("org.glassfish:javax.json:1.1.4")
             dependency("com.h2database:h2:1.4.200")
             dependency("ch.qos.logback:logback-classic:1.2.3")
+            dependency("org.hibernate:hibernate-core:5.4.17.Final")
             
             dependency("org.junit.jupiter:junit-jupiter-engine:5.6.2")
             dependency("org.junit.jupiter:junit-jupiter-params:5.6.2")
             dependency("org.assertj:assertj-core:3.16.1")
             dependency("org.mockito:mockito-junit-jupiter:3.3.3")
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+        }
+
+        resolutionStrategy {
+            force("net.bytebuddy:byte-buddy:1.10.10")
+            force("org.junit.jupiter:junit-jupiter-api:5.6.2")
         }
     }
 }
