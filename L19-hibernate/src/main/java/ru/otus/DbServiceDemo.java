@@ -10,6 +10,8 @@ import ru.otus.core.service.DbServiceUserImpl;
 import ru.otus.core.model.User;
 import ru.otus.hibernate.HibernateUtils;
 import ru.otus.hibernate.sessionmanager.SessionManagerHibernate;
+import skislitsyn.core.model.Address;
+import skislitsyn.core.model.Phone;
 
 import java.util.Optional;
 
@@ -18,7 +20,7 @@ public class DbServiceDemo {
 
     public static void main(String[] args) {
         // Все главное см в тестах
-        SessionFactory sessionFactory = HibernateUtils.buildSessionFactory("hibernate.cfg.xml", User.class);
+        SessionFactory sessionFactory = HibernateUtils.buildSessionFactory("hibernate.cfg.xml", User.class, Address.class, Phone.class);
 
         SessionManagerHibernate sessionManager = new SessionManagerHibernate(sessionFactory);
         UserDao userDao = new UserDaoHibernate(sessionManager);
