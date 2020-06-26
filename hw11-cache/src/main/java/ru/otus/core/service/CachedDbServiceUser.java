@@ -13,7 +13,7 @@ import ru.otus.core.model.User;
 import ru.otus.core.sessionmanager.SessionManager;
 
 public class CachedDbServiceUser implements DBServiceUser {
-    private static Logger logger = LoggerFactory.getLogger(DbServiceUserImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(CachedDbServiceUser.class);
 
     private final UserDao userDao;
     private final HwCache<Long, User> userCache = new MyCache<>();
