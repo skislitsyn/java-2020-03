@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+sourceCompatibility = JavaVersion.VERSION_13
+targetCompatibility = JavaVersion.VERSION_13
+
+dependencies {
+    implementation("ch.qos.logback:logback-classic")
+    implementation("com.google.code.gson:gson")
+
+    implementation("org.eclipse.jetty:jetty-server")
+    implementation("org.eclipse.jetty:jetty-webapp")
+    implementation("org.eclipse.jetty:jetty-security")
+    implementation("org.freemarker:freemarker")
+    
+    implementation("com.h2database:h2")
+    implementation("org.hibernate:hibernate-core")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.with {
+        encoding = 'UTF-8'
+    }
+}
+
+shadowJar {
+    archiveBaseName.set('hw12-webServer')
+    archiveVersion.set('0.1')
+    archiveClassifier.set('')
+    manifest {
+        attributes 'Main-Class': 'skislitsyn.MyWebServerApp'
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar

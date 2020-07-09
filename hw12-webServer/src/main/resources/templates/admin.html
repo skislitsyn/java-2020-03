@@ -1,0 +1,76 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Панель администратора</title>
+    <script>
+        function saveUser() {
+            const userNameTextBox = document.getElementById('userNameTextBox');
+            const addressStreetTextBox = document.getElementById('addressStreetTextBox');
+            const phoneNumbersTextBox = document.getElementById('phoneNumbersTextBox');
+            const name = userNameTextBox.value;
+            const street = addressStreetTextBox.value;
+            const numbers = (phoneNumbersTextBox.value).split(',');
+            
+            var address = new Object();
+            address.street = street;
+            
+            var phones = new Array();
+            for(var i in numbers) {
+            	var phone = new Object();
+                phone.number = numbers[i];
+                phones.push(phone);
+            }
+            
+            var user = new Object();
+            user.name = name;
+            user.address = address;
+            user.phones = phones;
+            
+            fetch(	'api/user', {
+            		method: 'POST',
+            	    headers: {
+            	        'Content-Type': 'application/json'
+            	    },
+            	    body: JSON.stringify(user)
+            		}
+           	)
+                .then(response => response.json())
+                .then(user => userDataContainer.innerHTML = "Пользователь успешно сохранён:\n" + JSON.stringify(user));
+        }
+    </script>
+</head>
+
+<body>
+<h4>Создать нового пользователя</h4>
+<input type="text" id = "userNameTextBox" style="width: 300px" placeholder="Введите имя пользователя">
+<br/>
+<input type="text" id = "addressStreetTextBox" style="width: 300px" placeholder="Введите адрес пользователя">
+<br/>
+<input type="textarea" id = "phoneNumbersTextBox" style="width: 300px; height: 50px" placeholder="Введите телефоны пользователя через запятую">
+<br/>
+<button onclick="saveUser()">Сохранить</button>
+<pre id = "userDataContainer" style="color: red"></pre>
+
+<h4>Список пользователей</h4>
+<button onClick="window.location.reload();">Обновить</button>
+<table border=1>
+    <thead>
+        <tr>
+            <th style="width: 150px">Имя</th>
+            <th style="width: 150px">Адрес</th>
+            <th style="width: 150px">Телефоны</th>
+        </tr>
+    </thead>
+    <tbody>
+		<#list users as user>
+	    	<tr>
+	    		<td>${user.name}
+	    		<td>${user.address.street}
+	    		<td><#list user.phones as phone>
+    					${phone.number}<#sep>, </#sep>
+					</#list>
+	  	</#list>
+    </tbody>
+</table>
+
+</body>
+</html>

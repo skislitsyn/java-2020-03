@@ -26,6 +26,10 @@ allprojects {
             dependency("ch.qos.logback:logback-classic:1.2.3")
             dependency("org.hibernate:hibernate-core:5.4.17.Final")
             dependency("org.ehcache:ehcache:3.8.1")
+            dependency("org.eclipse.jetty:jetty-server:9.4.29.v20200521")
+            dependency("org.eclipse.jetty:jetty-webapp:9.4.29.v20200521")
+            dependency("org.eclipse.jetty:jetty-security:9.4.29.v20200521")
+            dependency("org.freemarker:freemarker:2.3.30")
             
             dependency("org.junit.jupiter:junit-jupiter-engine:5.6.2")
             dependency("org.junit.jupiter:junit-jupiter-params:5.6.2")
