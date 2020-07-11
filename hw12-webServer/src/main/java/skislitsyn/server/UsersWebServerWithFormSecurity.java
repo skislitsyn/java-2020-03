@@ -15,7 +15,7 @@ import org.eclipse.jetty.util.security.Constraint;
 
 import com.google.gson.Gson;
 
-import ru.otus.core.dao.UserDao;
+import ru.otus.core.service.DBServiceUser;
 import ru.otus.server.UsersWebServerSimple;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.servlet.LoginServlet;
@@ -27,9 +27,9 @@ public class UsersWebServerWithFormSecurity extends UsersWebServerSimple {
 
     private final LoginService loginService;
 
-    public UsersWebServerWithFormSecurity(int port, LoginService loginService, UserDao userDao, Gson gson,
+    public UsersWebServerWithFormSecurity(int port, LoginService loginService, DBServiceUser dbServiceUser, Gson gson,
 	    TemplateProcessor templateProcessor) {
-	super(port, userDao, gson, templateProcessor);
+	super(port, dbServiceUser, gson, templateProcessor);
 	this.loginService = loginService;
     }
 

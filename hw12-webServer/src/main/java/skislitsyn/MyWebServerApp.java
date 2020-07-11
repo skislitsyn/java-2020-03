@@ -9,6 +9,8 @@ import com.google.gson.GsonBuilder;
 
 import ru.otus.core.dao.UserDao;
 import ru.otus.core.model.User;
+import ru.otus.core.service.DBServiceUser;
+import ru.otus.core.service.DbServiceUserImpl;
 import ru.otus.helpers.FileSystemHelper;
 import ru.otus.hibernate.HibernateUtils;
 import ru.otus.hibernate.dao.UserDaoHibernate;
@@ -31,6 +33,7 @@ public class MyWebServerApp {
 		Address.class, Phone.class);
 	SessionManagerHibernate sessionManager = new SessionManagerHibernate(sessionFactory);
 	UserDao userDao = new UserDaoHibernate(sessionManager);
+	DBServiceUser dbServiceUser = new DbServiceUserImpl(userDao);
 	Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 	TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
 
@@ -39,8 +42,8 @@ public class MyWebServerApp {
 	LoginService loginService = new HashLoginService(REALM_NAME, hashLoginServiceConfigPath);
 	// LoginService loginService = new InMemoryLoginServiceImpl(userDao);
 
-	UsersWebServer usersWebServer = new UsersWebServerWithFormSecurity(WEB_SERVER_PORT, loginService, userDao, gson,
-		templateProcessor);
+	UsersWebServer usersWebServer = new UsersWebServerWithFormSecurity(WEB_SERVER_PORT, loginService, dbServiceUser,
+		gson, templateProcessor);
 
 	usersWebServer.start();
 	usersWebServer.join();

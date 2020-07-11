@@ -13,7 +13,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.google.gson.Gson;
 
-import ru.otus.core.dao.UserDao;
+import ru.otus.core.service.DBServiceUser;
 import ru.otus.helpers.FileSystemHelper;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.servlet.UsersApiServlet;
@@ -24,13 +24,13 @@ public class UsersWebServerSimple implements UsersWebServer {
     private static final String START_PAGE_NAME = "index.html";
     private static final String COMMON_RESOURCES_DIR = "static";
 
-    private final UserDao userDao;
+    private final DBServiceUser dbServiceUser;
     private final Gson gson;
     protected final TemplateProcessor templateProcessor;
     private final Server server;
 
-    public UsersWebServerSimple(int port, UserDao userDao, Gson gson, TemplateProcessor templateProcessor) {
-	this.userDao = userDao;
+    public UsersWebServerSimple(int port, DBServiceUser dbServiceUser, Gson gson, TemplateProcessor templateProcessor) {
+	this.dbServiceUser = dbServiceUser;
 	this.gson = gson;
 	this.templateProcessor = templateProcessor;
 	server = new Server(port);
@@ -92,9 +92,11 @@ public class UsersWebServerSimple implements UsersWebServer {
     private ServletContextHandler createServletContextHandler() {
 	ServletContextHandler servletContextHandler = new ServletContextHandler(
 		ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
-	servletContextHandler.addServlet(new ServletHolder(new UsersServlet(templateProcessor, userDao)), "/users");
-	servletContextHandler.addServlet(new ServletHolder(new UsersApiServlet(userDao, gson)), "/api/user/*");
-	servletContextHandler.addServlet(new ServletHolder(new AdminServlet(templateProcessor, userDao)), "/admin");
+	servletContextHandler.addServlet(new ServletHolder(new UsersServlet(templateProcessor, dbServiceUser)),
+		"/users");
+	servletContextHandler.addServlet(new ServletHolder(new UsersApiServlet(dbServiceUser, gson)), "/api/user/*");
+	servletContextHandler.addServlet(new ServletHolder(new AdminServlet(templateProcessor, dbServiceUser)),
+		"/admin");
 	return servletContextHandler;
     }
 }
