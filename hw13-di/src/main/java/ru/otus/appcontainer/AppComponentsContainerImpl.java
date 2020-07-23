@@ -43,6 +43,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 	return (C) searchAppComponentByClass(componentClass);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <C> C getAppComponent(String componentName) {
 	return (C) appComponentsByName.get(componentName);
@@ -56,13 +57,10 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 		AppComponent appComponent = method.getAnnotation(AppComponent.class);
 
 		int order = appComponent.order();
-		if (methodsOrderMap.containsKey(order)) {
-		    methodsOrderMap.get(order).add(method);
-		} else {
-		    List<Method> methodsOfOneOrder = new ArrayList<>();
-		    methodsOfOneOrder.add(method);
-		    methodsOrderMap.put(order, methodsOfOneOrder);
+		if (!methodsOrderMap.containsKey(order)) {
+		    methodsOrderMap.put(order, new ArrayList<>());
 		}
+		methodsOrderMap.get(order).add(method);
 
 		String name = appComponent.name();
 		methodNameMap.put(method, name);
@@ -89,13 +87,9 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     }
 
     private Object createAppComponent(Object obj, Method method) throws ReflectiveOperationException {
-	if (method.getParameterCount() > 0) {
-	    Class<?>[] paramTypes = method.getParameterTypes();
-	    Object[] args = searchMethodArguments(paramTypes);
-	    return method.invoke(obj, args);
-	} else {
-	    return method.invoke(obj);
-	}
+	Class<?>[] paramTypes = method.getParameterTypes();
+	Object[] args = searchMethodArguments(paramTypes);
+	return method.invoke(obj, args);
     }
 
     private Object[] searchMethodArguments(Class<?>[] paramTypes) {
