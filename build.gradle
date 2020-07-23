@@ -30,6 +30,7 @@ allprojects {
             dependency("org.eclipse.jetty:jetty-webapp:9.4.29.v20200521")
             dependency("org.eclipse.jetty:jetty-security:9.4.29.v20200521")
             dependency("org.freemarker:freemarker:2.3.30")
+            dependency("org.reflections:reflections:0.9.12")
             
             dependency("org.junit.jupiter:junit-jupiter-engine:5.6.2")
             dependency("org.junit.jupiter:junit-jupiter-params:5.6.2")
