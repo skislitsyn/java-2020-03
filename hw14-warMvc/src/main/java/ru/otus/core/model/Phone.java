@@ -1,4 +1,4 @@
-package skislitsyn.core.model;
+package ru.otus.core.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

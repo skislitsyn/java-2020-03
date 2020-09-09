@@ -14,9 +14,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import skislitsyn.core.model.Address;
-import skislitsyn.core.model.Phone;
-
 @Entity
 @Table(name = "users")
 public class User {
